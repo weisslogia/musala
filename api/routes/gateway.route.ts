@@ -1,55 +1,80 @@
 import express, {Request, Response} from 'express';
-import Gateway from '../models/gateway.model'
-import Peripheral from '../models/peripheral.model'
-import * as dotenv from 'dotenv';
 import mongoose from 'mongoose';
-import { IGatewayPost, IPeriferal } from '../interfaces/gateway.interface';
+import { IGateway, IGatewayPost, IPeripheralPost } from '../interfaces/gateway.interface';
+import { addPeripheral, create, index, remove, removePeripheral, show, update } from '../controllers/gateway.controller';
 
-dotenv.config();
 const router = express.Router();
 router.route('/').get(async (req: Request, res: Response) => {
     try {
-        const gateways = await Gateway.aggregate(
-            [
-                { 
-                    $lookup: {
-                        from: 'peripherals',
-                        localField: 'peripherals_id',
-                        foreignField: '_id',
-                        as: 'peripherals'
-                    }
-                }
-            ]
-        );
-        res.status(200).json(gateways)
-    } catch(e) {
+        const gateways: IGateway[] = await index();
+        res.status(200).json(gateways);
+    } catch(e: any) {
         console.error(e)
-        res.status(500).json({message: "Fatal error"})
+        res.status(e.code? e.code : 500).send(e.message ? e.message : 'Error');
+    }
+})
+
+router.route('/:id').get(async (req: Request, res: Response) => {
+    try {
+        const gateways: IGateway = await show(new mongoose.Types.ObjectId(req.params.id));
+        res.status(200).json(gateways);
+    } catch(e: any) {
+        console.error(e)
+        res.status(e.code? e.code : 500).send(e.message ? e.message : 'Error');
     }
 })
 
 router.route('/').post(async (req: Request, res: Response) => {
     try {
-        const gateways: IGatewayPost = req.body
-        const peripherals_id: IPeriferal[] = [];
-        const promises: Promise<any>[] = []
-        gateways.peripherals.forEach(peripheral => {
-            promises.push(Peripheral.create(peripheral))
-        })
-        Promise.all(promises).then(values=> {
-            console.log(promises);
-            
-            values.forEach(value => peripherals_id.push(value._id));
-        })
-        // const gateway = await Gateway.create({
-        //     ip_address: gateways.ip_address,
-        //     name: gateways.name,
-        //     peripherals_id
-        // })
-        res.status(201).json(gateways.peripherals)
-    } catch(e) {
+        const params: IGatewayPost = req.body
+        const gateway: IGateway = await create(params);
+        res.status(201).json(gateway)
+    } catch(e: any) {
         console.error(e)
-        res.status(500).json({message: "Fatal error"})
+        res.status(e.code? e.code : 500).send(e.message ? e.message : 'Error')
+    }
+})
+
+router.route('/addPeripheral/:id').post(async (req: Request, res: Response) => {
+    try {
+        const params: IPeripheralPost = req.body
+        const gateway: IGateway = await addPeripheral(req.params.id, params);
+        res.status(201).json(gateway)
+    } catch(e: any) {
+        console.error(e)
+        res.status(e.code? e.code : 500).send(e.message ? e.message : 'Error')
+    }
+})
+
+router.route('/:id').put(async (req: Request, res: Response) => {
+    try {
+        const params: IGatewayPost = req.body
+        const gateway: IGateway = await update(req.params.id, params);
+        res.status(200).json(gateway)
+    } catch(e: any) {
+        console.error(e)
+        res.status(e.code? e.code : 500).send(e.message ? e.message : 'Error')
+    }
+})
+
+router.route('/:id').delete(async (req: Request, res: Response) => {
+    try {
+        const gateway: IGateway = await remove(req.params.id);
+        res.status(200).json(gateway)
+    } catch(e: any) {
+        console.error(e)
+        res.status(e.code? e.code : 500).send( e.message ? e.message : 'Error')
+    }
+})
+
+router.route('/removePeripheral/:idGateway/:idPeriferal').delete(async (req: Request, res: Response) => {
+    try {
+        const {idGateway,idPeriferal } = req.params
+        const gateway: IGateway = await removePeripheral(idGateway, idPeriferal);
+        res.status(201).json(gateway)
+    } catch(e: any) {
+        console.error(e)
+        res.status(e.code? e.code : 500).send(e.message ? e.message : 'Error')
     }
 })
 
