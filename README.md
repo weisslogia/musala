@@ -65,14 +65,6 @@ cd api
 npm install
 npm run test
 ```
-### Frontend tests
-The tests where made with React Testing Library
-   ```sh
-cd frontend
-npm install
-npm run test
-```
-
 ## Run with Docker
 
 ```sh
