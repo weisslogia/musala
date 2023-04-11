@@ -7,6 +7,7 @@ export interface IGatewayPost {
 }
 
 export interface IPeripheralPost {
+    _id?: string;
     status: string;
     UID: number;
     vendor: string;

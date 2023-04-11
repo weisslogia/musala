@@ -1,26 +1,18 @@
-import { log } from "console";
 import mongoose from "mongoose";
 import Gateway from "../models/gateway.model";
 import Peripheral from "../models/peripheral.model";
-// import User from './models/user.js';
-// import Profile from './models/profile.js';
+import { MongoMemoryServer } from 'mongodb-memory-server';
 
-const connectDB = (url: string) => {
+
+const connectDB = async (url: string = "") => {
     mongoose.set('strictQuery', true);
-    mongoose.connect(url).then(async ()=> {
-        log('connected to mongodb')
-        // const p: any = await Peripheral.create({
-        //     status: "online",
-        //     UID: 1,
-        //     vendor: "amazon" 
-
-        // })
-        // const peripherals_id = [p._id]
-        // await Gateway.create({
-        //     ip_address: "127.0.0.1",
-        //     name: "localhost",
-        //     peripherals_id
-        // })
+    let uri = url
+    if (url === "") {
+        const mongod = await MongoMemoryServer.create();
+        uri =  await mongod.getUri();
+    }
+    mongoose.connect(uri).then(async ()=> {
+        console.log('connected to mongodb')
     })
     .catch(err => console.error(err))
 }

@@ -14,7 +14,9 @@ export const index = async (): Promise<IGateway[]> => {
                         foreignField: '_id',
                         as: 'peripherals'
                     }
-                }
+                },
+                {$sort: {"peripherals.UID": 1}}
+
             ]
         );
         return gateways;
@@ -71,7 +73,17 @@ export const create = async (gateway: IGatewayPost): Promise<IGateway> => {
 
 export const update = async (id: string, newData: IGatewayPost): Promise<IGateway> => {
     try {
-        const gateway = await Gateway.findOneAndUpdate({ _id: new mongoose.Types.ObjectId(id) }, { $set: { "name": newData.name, "ip_address": newData.ip_address } });
+        const updates = newData.peripherals.map(peripheral => Peripheral.findOneAndUpdate(
+            {_id: new mongoose.Types.ObjectId(peripheral._id)},
+            {$setOnInsert: {status: peripheral.status, UID: peripheral.UID, vendor: peripheral.vendor}},
+            {
+                returnOriginal: false,
+                upsert: true
+            }
+        ))
+        const result = await Promise.all(updates);
+        const ids = result.map(el => el?._id);
+        const gateway = await Gateway.findOneAndUpdate({ _id: new mongoose.Types.ObjectId(id) }, { $set: { "name": newData.name, "ip_address": newData.ip_address, peripherals_id: ids } });
         if (!gateway) {
             throw { code: 404, message: 'unknown id' };
         } else {
