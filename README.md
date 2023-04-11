@@ -69,7 +69,13 @@ npm run test
 
 ```sh
 docker build . -t weisslogia/musala-gateway
-docker run -p 8080:8080 -p 3000:3000 -d <user>/musala-gateway
+docker run -p 8080:8080 -p 4000:4000 -d <user>/musala-gateway
+```
+watch the logs in order to wait the app boot
+copy the container id from the commando below
+```sh
+docker ps
+docker logs <container_id>
 ```
    [express]: <http://expressjs.com>
    [React]: <https://react.dev/>
