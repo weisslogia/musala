@@ -1,0 +1,18 @@
+{
+  "name": "musala",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "install-api ": "npm install --prefix ./api",
+    "build-api": "npm run build --prefix ./api",
+    "start": "concurrently \"npm start --prefix ./api\" \"npm run optimize --prefix ./frontend && npm run preview --prefix ./frontend -- --port 8080 --host 0.0.0.0\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^8.0.1"
+  }
+}
