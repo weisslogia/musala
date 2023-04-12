@@ -8,7 +8,7 @@ This project was created with:
 ## Available Scripts
 Before you are able to run the app you need to install the dependencies
 ```sh
-cd url_of_the_cloned_app
+cd path_of_the_cloned_app
 npm install
 npm install --prefix ./api
 npm install --prefix ./frontend
