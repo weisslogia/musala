@@ -68,7 +68,7 @@ npm run test
 ## Run with Docker
 
 ```sh
-docker build . -t weisslogia/musala-gateway
+docker build . -t <user>/musala-gateway
 docker run -p 8080:8080 -p 4000:4000 -d <user>/musala-gateway
 ```
 watch the logs in order to wait the app boot
